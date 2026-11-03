@@ -1,0 +1,1759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WorkHub - Office Workspace Dashboard</title>
+  
+  <!-- Modern Typography: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       THEME VARIABLES (Light & Dark Mode)
+       ========================================================================== */
+    :root {
+      --bg-page: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-surface-subtle: #f1f5f9;
+      --bg-surface-active: #e2e8f0;
+      --border-color: #e2e8f0;
+      --border-hover: #cbd5e1;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+      --card-hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+      --tab-bg: #f8fafc;
+    }
+
+    [data-theme="dark"] {
+      --bg-page: #090d16;
+      --bg-surface: #111827;
+      --bg-surface-subtle: #1f2937;
+      --bg-surface-active: #374151;
+      --border-color: #1f293d;
+      --border-hover: #374151;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+      --card-hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+      --tab-bg: #0b1120;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: background-color 0.2s ease, color 0.2s ease;
+      line-height: 1.5;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Header */
+    header {
+      background-color: var(--bg-surface);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      backdrop-filter: blur(12px);
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      gap: 16px;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
+      flex-shrink: 0;
+    }
+
+    .brand-icon-box {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      background: #2563eb;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+      box-shadow: 0 1px 3px rgba(37, 99, 235, 0.3);
+    }
+
+    .brand-title {
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .brand-sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      line-height: 1;
+    }
+
+    /* Search Input in Header */
+    .header-search {
+      flex: 1;
+      max-width: 440px;
+      margin: 0 16px;
+      position: relative;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      width: 16px;
+      height: 16px;
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 9px 34px 9px 36px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-surface-subtle);
+      color: var(--text-primary);
+      font-size: 0.875rem;
+      outline: none;
+      transition: all 0.15s ease;
+    }
+
+    .search-input:focus {
+      background-color: var(--bg-surface);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .search-clear {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: none;
+      padding: 2px;
+    }
+
+    .search-clear:hover {
+      color: var(--text-primary);
+    }
+
+    /* Header Controls */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .view-toggle {
+      display: flex;
+      align-items: center;
+      background-color: var(--bg-surface-subtle);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 2px;
+    }
+
+    .view-btn {
+      background: none;
+      border: none;
+      padding: 6px 8px;
+      border-radius: 6px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      transition: all 0.15s ease;
+    }
+
+    .view-btn.active {
+      background-color: var(--bg-surface);
+      color: var(--text-primary);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    }
+
+    .btn-primary {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background-color: var(--primary);
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-icon {
+      background: none;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 8px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    .btn-icon:hover {
+      background-color: var(--bg-surface-subtle);
+      color: var(--text-primary);
+    }
+
+    /* Main Area */
+    main {
+      flex: 1;
+      padding: 32px 0 48px 0;
+    }
+
+    /* Mobile Search */
+    .mobile-search {
+      display: none;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    /* Title Block */
+    .dashboard-header {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .dashboard-header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .meta-tagline {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .meta-dot {
+      opacity: 0.4;
+    }
+
+    .meta-count {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .dashboard-title {
+      font-size: 1.75rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+    }
+
+    .btn-reset {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-reset:hover {
+      color: var(--text-primary);
+      border-color: var(--border-hover);
+    }
+
+    /* Categories Bar */
+    .categories-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      margin-bottom: 28px;
+      scrollbar-width: none;
+    }
+
+    .categories-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .category-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.775rem;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+      background-color: var(--bg-surface);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+      transition: all 0.15s ease;
+    }
+
+    .category-chip:hover {
+      color: var(--text-primary);
+      border-color: var(--border-hover);
+    }
+
+    .category-chip.active {
+      background-color: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 1px 3px rgba(37, 99, 235, 0.3);
+    }
+
+    .category-count {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      padding: 1px 6px;
+      border-radius: 10px;
+      background-color: var(--bg-surface-subtle);
+      color: var(--text-secondary);
+    }
+
+    .category-chip.active .category-count {
+      background-color: rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+    }
+
+    /* Cards Grid View */
+    .portals-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+      gap: 24px;
+    }
+
+    /* Folder Card */
+    .portal-card {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      box-shadow: var(--card-shadow);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+      overflow: hidden;
+    }
+
+    .portal-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--card-hover-shadow);
+    }
+
+    /* Folder Tab Top Header */
+    .card-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px 8px 16px;
+      border-bottom: 1px solid var(--border-color);
+      background-color: var(--tab-bg);
+    }
+
+    .card-cat-label {
+      font-size: 0.6875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .card-actions-top {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .icon-action-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      padding: 4px;
+      border-radius: 5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    .icon-action-btn:hover {
+      color: var(--text-primary);
+      background-color: var(--bg-surface-active);
+    }
+
+    .icon-action-btn.btn-trash:hover {
+      color: #ef4444;
+    }
+
+    .icon-action-btn.is-pinned {
+      color: #f59e0b;
+    }
+
+    /* Card Main Body */
+    .card-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .card-title-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+
+    .card-app-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background-color: var(--bg-surface-subtle);
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.65rem;
+      flex-shrink: 0;
+      transition: transform 0.2s ease;
+    }
+
+    .portal-card:hover .card-app-icon {
+      transform: scale(1.06);
+    }
+
+    .card-title-meta {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      line-height: 1.3;
+      margin-bottom: 2px;
+      color: var(--text-primary);
+      text-decoration: none;
+    }
+
+    .card-host {
+      font-size: 0.72rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: block;
+    }
+
+    .card-description {
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-bottom: 18px;
+      flex: 1;
+    }
+
+    /* Card Bottom Footer */
+    .card-footer {
+      padding-top: 14px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .btn-copy-link {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      padding: 6px 8px;
+      border-radius: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-copy-link:hover {
+      color: var(--text-primary);
+      background-color: var(--bg-surface-subtle);
+    }
+
+    .btn-open-site {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 0.8125rem;
+      font-weight: 700;
+      text-decoration: none;
+      color: #ffffff;
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .btn-open-site:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+
+    .btn-open-site:active {
+      transform: scale(0.98);
+    }
+
+    /* Color Themes */
+    .color-blue .btn-open-site { background-color: #2563eb; }
+    .color-blue:hover { border-color: rgba(37, 99, 235, 0.4); }
+    
+    .color-amber .btn-open-site { background-color: #d97706; }
+    .color-amber:hover { border-color: rgba(217, 119, 6, 0.4); }
+
+    .color-emerald .btn-open-site { background-color: #059669; }
+    .color-emerald:hover { border-color: rgba(5, 150, 105, 0.4); }
+
+    .color-purple .btn-open-site { background-color: #9333ea; }
+    .color-purple:hover { border-color: rgba(147, 51, 234, 0.4); }
+
+    .color-rose .btn-open-site { background-color: #e11d48; }
+    .color-rose:hover { border-color: rgba(225, 29, 72, 0.4); }
+
+    .color-cyan .btn-open-site { background-color: #0891b2; }
+    .color-cyan:hover { border-color: rgba(8, 145, 178, 0.4); }
+
+    .color-indigo .btn-open-site { background-color: #4f46e5; }
+    .color-indigo:hover { border-color: rgba(79, 70, 229, 0.4); }
+
+    .color-slate .btn-open-site { background-color: #475569; }
+    .color-slate:hover { border-color: rgba(71, 85, 105, 0.4); }
+
+    /* Compact List View */
+    .portals-list {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      background-color: var(--bg-surface);
+      overflow: hidden;
+    }
+
+    .list-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-color);
+      gap: 16px;
+      transition: background-color 0.15s ease;
+    }
+
+    .list-row:last-child {
+      border-bottom: none;
+    }
+
+    .list-row:hover {
+      background-color: var(--bg-surface-subtle);
+    }
+
+    .list-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .list-icon {
+      font-size: 1.4rem;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background-color: var(--bg-surface-subtle);
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .list-info {
+      min-width: 0;
+    }
+
+    .list-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .list-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .list-cat {
+      font-size: 0.65rem;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 1px 6px;
+      border-radius: 10px;
+      background-color: var(--bg-surface-subtle);
+      color: var(--text-muted);
+    }
+
+    .list-desc {
+      font-size: 0.775rem;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 2px;
+    }
+
+    .list-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .list-host {
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-muted);
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 64px 20px;
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      max-width: 460px;
+      margin: 40px auto;
+    }
+
+    .empty-icon {
+      font-size: 2.5rem;
+      margin-bottom: 12px;
+    }
+
+    .empty-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .empty-text {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+    }
+
+    /* Modal Form */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 100;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-box {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+      animation: modalFadeIn 0.15s ease-out;
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-title {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px;
+      display: flex;
+    }
+
+    .modal-close:hover {
+      color: var(--text-primary);
+    }
+
+    .modal-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-label {
+      font-size: 0.775rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-surface-subtle);
+      color: var(--text-primary);
+      font-size: 0.85rem;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      background-color: var(--bg-surface);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    /* Quick Emoji Selection Buttons */
+    .emoji-pick-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.25rem;
+      padding: 2px;
+      line-height: 1;
+      transition: transform 0.15s ease;
+    }
+
+    .emoji-pick-btn:hover {
+      transform: scale(1.3);
+    }
+
+    .color-options {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .color-circle {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+
+    .color-circle:hover {
+      transform: scale(1.15);
+    }
+
+    .color-circle.selected {
+      border-color: var(--text-primary);
+      transform: scale(1.15);
+    }
+
+    .modal-footer {
+      padding: 14px 20px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      background-color: var(--tab-bg);
+    }
+
+    .btn-secondary {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--bg-surface-active);
+    }
+
+    /* Footer */
+    footer {
+      margin-top: auto;
+      border-top: 1px solid var(--border-color);
+      background-color: var(--bg-surface);
+      padding: 20px 0;
+      font-size: 0.775rem;
+      color: var(--text-muted);
+    }
+
+    .footer-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    @media (max-width: 768px) {
+      .header-search { display: none; }
+      .mobile-search { display: block; }
+      .list-host { display: none; }
+      .dashboard-title { font-size: 1.5rem; }
+      .portals-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header>
+    <div class="container header-content">
+      <!-- Brand Wordmark -->
+      <a href="#" class="brand-section">
+        <div class="brand-icon-box">💼</div>
+        <div>
+          <div class="brand-title">WorkHub</div>
+          <div class="brand-sub">Office Workspace Dashboard</div>
+        </div>
+      </a>
+
+      <!-- Desktop Search Bar -->
+      <div class="header-search">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="desktopSearch" class="search-input" placeholder="Search office portals... (Press '/' to search)" autocomplete="off">
+        <button id="clearSearchBtn" class="search-clear" title="Clear">✕</button>
+      </div>
+
+      <!-- Actions -->
+      <div class="header-actions">
+        <!-- View Toggle -->
+        <div class="view-toggle">
+          <button id="viewGridBtn" class="view-btn active" title="Grid View">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+          </button>
+          <button id="viewListBtn" class="view-btn" title="List View">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line>
+              <line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line>
+              <line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Add Website Button -->
+        <button id="addWebsiteBtn" class="btn-primary">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>Add Website</span>
+        </button>
+
+        <!-- Theme Toggle Button -->
+        <button id="themeToggleBtn" class="btn-icon" aria-label="Toggle Theme" title="Switch Dark/Light Theme">
+          <span id="themeIcon">🌙</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="container">
+    <!-- Mobile Search -->
+    <div class="mobile-search">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input type="text" id="mobileSearch" class="search-input" placeholder="Search office websites..." autocomplete="off">
+    </div>
+
+    <!-- Dashboard Title Block -->
+    <div class="dashboard-header">
+      <div class="dashboard-header-top">
+        <div class="meta-tagline">
+          <span>Workspace Directory</span>
+          <span class="meta-dot">·</span>
+          <span class="meta-count" id="portalsCount">7 Connected Portals</span>
+          <span class="meta-dot">·</span>
+          <span>Opens in new tab</span>
+        </div>
+
+        <button id="resetDefaultsBtn" class="btn-reset" title="Reset back to default 7 office portals">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+          </svg>
+          <span>Reset Defaults</span>
+        </button>
+      </div>
+
+      <h1 class="dashboard-title">Office Portals & Applications</h1>
+    </div>
+
+    <!-- Category Filters -->
+    <div class="categories-bar" id="categoriesBar"></div>
+
+    <!-- Portals Container (Grid or List) -->
+    <div id="portalsContainer"></div>
+  </main>
+
+  <!-- Add / Edit Website Modal -->
+  <div id="portalModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle">Add New Office Website</div>
+        <button id="closeModalBtn" class="modal-close">✕</button>
+      </div>
+
+      <form id="portalForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Website Title *</label>
+            <input type="text" id="inputTitle" class="form-input" placeholder="e.g. Employee HR Portal, Corporate Email" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Website URL * </label>
+            <input type="text" id="inputUrl" class="form-input" placeholder="https://XYZ.COM" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Department / Category</label>
+              <select id="inputCategory" class="form-select">
+                <option value="F.M POTAL">F.M PORTAL</option>
+                <option value="SIDES POTAL">SIDE PORTALS</option>
+              </select>
+            </div>
+
+            <!-- Icon / Emoji Input with Quick Picker Buttons -->
+            <div class="form-group">
+              <label class="form-label">Icon / Emoji</label>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <input type="text" id="inputIcon" class="form-input" value="💼" maxlength="4" style="width: 54px; text-align: center; font-size: 1.25rem; padding: 6px; flex-shrink: 0;">
+                <div style="display: flex; align-items: center; gap: 6px; font-size: 1.2rem;">
+                  <button type="button" class="emoji-pick-btn" onclick="selectEmoji('💼')">💼</button>
+                  <button type="button" class="emoji-pick-btn" onclick="selectEmoji('✉️')">✉️</button>
+                  <button type="button" class="emoji-pick-btn" onclick="selectEmoji('📈')">📈</button>
+                  <button type="button" class="emoji-pick-btn" onclick="selectEmoji('💳')">💳</button>
+                  <button type="button" class="emoji-pick-btn" onclick="selectEmoji('🛠️')">🛠️</button>
+                  <button type="button" class="emoji-pick-btn" onclick="selectEmoji('☁️')">☁️</button>
+                  <button type="button" class="emoji-pick-btn" onclick="selectEmoji('📚')">📚</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Card Color Theme</label>
+            <div class="color-options" id="colorOptions"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea id="inputDesc" class="form-textarea" rows="2" placeholder="Website description..."></textarea>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="inputPinned" style="cursor: pointer;">
+            <label for="inputPinned" style="font-size: 0.8rem; cursor: pointer;">Pin to favorites (shows on top)</label>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="cancelModalBtn" class="btn-secondary">Cancel</button>
+          <button type="submit" class="btn-primary" id="savePortalBtn">Save Portal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-content">
+      <div>WorkHub Office Portal · Clean Folder Grid Dashboard</div>
+      <div>All office links open securely with <code>target="_blank"</code></div>
+    </div>
+  </footer>
+
+  <!-- ==========================================================================
+       JAVASCRIPT CODE
+       ========================================================================== -->
+  <script>
+    /* ==========================================================================
+       DEFAULT OFFICE WEBSITES ARRAY
+       ========================================================================== */
+    var DEFAULT_PORTALS = [
+      {
+        id: "portal-1",
+        title: "BANK PAY ORDER GENERATOR",
+        description: "------------------->>>>",
+        url: "https://asadmunir-dev.github.io/F.M-B-Quick-PayOrder-System/",
+        category: "F.M POTAL",
+        icon: "💼",
+        themeColor: "blue",
+        pinned: true
+      },
+      {
+        id: "portal-2",
+        title: "ADAMJEE-ENG-FREIGHT-INVOICE",
+        description: "------------------->>>>",
+        url: "https://adamjee-eng-freight-invoice0.ai.studio/",
+        category: "F.M POTAL",
+        icon: "✉️",
+        themeColor: "amber",
+        pinned: true
+      },
+      {
+        id: "portal-3",
+        title: "DUTY CALUCULATE",
+        description: "------------------->>>>",
+        url: "https://f-m-brothers-pay-order-advise-991948915594.asia-southeast1.run.app/",
+        category: "F.M POTAL",
+        icon: "📈",
+        themeColor: "emerald",
+        pinned: true
+      },
+      {
+        id: "portal-4",
+        title: "F.M Brothers Bill",
+        description: "------------------->>>>",
+        url: "https://fm-brothers-bill.ai.studio/",
+        category: "F.M POTAL",
+        icon: "💳",
+        themeColor: "purple",
+        pinned: true
+      },
+      {
+        id: "portal-5",
+        title: "Carbon Wire Rod Quote",
+        description: "",
+        url: "https://asadmunir-dev.github.io/my-website/",
+        category: "F.M POTAL",
+        icon: "🛠️",
+        themeColor: "rose",
+        pinned: false
+      },
+      {
+        id: "portal-6",
+        title: "SALES TAX TOTAL - F.M BROTHERS",
+        description: "",
+        url: "https://asadmunir-dev.github.io/SALES-TAX-LEDGER---F.M-BROTHERS/",
+        category: "F.M POTAL",
+        icon: "☁️",
+        themeColor: "cyan",
+        pinned: false
+      },
+      {
+        id: "portal-7",
+        title: "nBIS POTAL",
+        description: "------------------->>>>",
+        url: "https://hphldp.hpmeatp.com/elcs/test/main/",
+        category: "SIDES POTAL",
+        icon: "☁️",
+        themeColor: "emerald",
+        pinned: true
+      },
+       {
+        id: "portal-8",
+        title: "SAPT Trade Portal / Container Inquiry",
+        description: "",
+        url: "https://hphldp.hpmeatp.com/elcs/func/bu/8a811f12818a8d3d01818f5a80c80077/ALL",
+        category: "SIDES POTAL",
+        icon: "☁️",
+        themeColor: "cyan",
+        pinned: false
+      },
+      {
+        id: "portal-9",
+        title: "SAPT Container/ BL/ Shipping Bill Enquiry",
+        description: "",
+        url: "https://sapt.com.pk/enquiries?culture=en",
+        category: "SIDES POTAL",
+        icon: "☁️",
+        themeColor: "cyan",
+        pinned: false
+      },
+       {
+        id: "portal-10",
+        title: "KICT Container/ BL/ Shipping Bill Enquiry",
+        description: "",
+        url: "https://www.kictl.com/enquiries?culture=en#detailView",
+        category: "SIDES POTAL",
+        icon: "☁️",
+        themeColor: "cyan",
+        pinned: false
+      },
+       {
+        id: "portal-11",
+        title: "KGTL online-tracking",
+        description: "",
+        url: "https://www.kgtl.com.pk/en/online-tracking",
+        category: "SIDES POTAL",
+        icon: "☁️",
+        themeColor: "cyan",
+        pinned: false
+      },
+      {
+        id: "portal-11",
+        title: "PSW D/O Port Community System ",
+        description: "------------------->>>>",
+        url: "https://app.pcs.gov.pk/login?ReturnUrl=https%3A%2F%2Fapp.pcs.gov.pk%2Fidentity%2Fconnect%2Fauthorize%2Fcallback%3Fclient_id%3D4667d852-9a5f-4316-8604-51ebd67ef966%26redirect_uri%3Dhttps%253A%252F%252Fapp.pcs.gov.pk%252F%26response_type%3Dcode%26scope%3Dopenid%2520profile%2520offline_access%26state%3De11a107de8784281988ba888a369aae6%26code_challenge%3Dxmf5OLYx_iqZhjqkoIkQNJ7_49f-euyQMe22R7I_Yqc%26code_challenge_method%3DS256%26response_mode%3Dquery",
+        category: "SIDES POTAL",
+        icon: "☁️",
+        themeColor: "emerald",
+        pinned: true
+      },
+      {
+        id: "portal-11",
+        title: "DP World Shipping enquiry ",
+        description: "",
+        url: "https://lfs.qict.com.pk/",
+        category: "SIDES POTAL",
+        icon: "☁️",
+        themeColor: "cyan",
+        pinned: false
+      },
+    ];
+
+    var COLOR_PALETTES = [
+      { name: "blue", hex: "#2563eb" },
+      { name: "amber", hex: "#d97706" },
+      { name: "emerald", hex: "#059669" },
+      { name: "purple", hex: "#9333ea" },
+      { name: "rose", hex: "#e11d48" },
+      { name: "cyan", hex: "#0891b2" },
+      { name: "indigo", hex: "#4f46e5" },
+      { name: "slate", hex: "#475569" }
+    ];
+
+    // State (Auto-sync: Jab bhi code mein array ya url change karein, refresh par foran reflect hoga)
+    var codeString = JSON.stringify(DEFAULT_PORTALS);
+    var lastCode = null;
+    try {
+      lastCode = localStorage.getItem("workhub_code_hash_v2");
+    } catch (e) {}
+
+    var portals = [];
+    if (lastCode !== codeString) {
+      portals = DEFAULT_PORTALS.slice();
+      try {
+        localStorage.setItem("workhub_code_hash_v2", codeString);
+        localStorage.setItem("workhub_portals", JSON.stringify(portals));
+      } catch (e) {}
+    } else {
+      try {
+        var saved = localStorage.getItem("workhub_portals");
+        if (saved) {
+          portals = JSON.parse(saved);
+        } else {
+          portals = DEFAULT_PORTALS.slice();
+        }
+      } catch (e) {
+        portals = DEFAULT_PORTALS.slice();
+      }
+    }
+
+    var currentCategory = "All";
+    var searchQuery = "";
+    var currentView = "grid";
+    var editingPortalId = null;
+    var selectedColor = "blue";
+
+    // DOM Elements
+    var portalsContainer = document.getElementById("portalsContainer");
+    var categoriesBar = document.getElementById("categoriesBar");
+    var portalsCount = document.getElementById("portalsCount");
+    var desktopSearch = document.getElementById("desktopSearch");
+    var mobileSearch = document.getElementById("mobileSearch");
+    var clearSearchBtn = document.getElementById("clearSearchBtn");
+    var viewGridBtn = document.getElementById("viewGridBtn");
+    var viewListBtn = document.getElementById("viewListBtn");
+    var themeToggleBtn = document.getElementById("themeToggleBtn");
+    var themeIcon = document.getElementById("themeIcon");
+    var addWebsiteBtn = document.getElementById("addWebsiteBtn");
+    var resetDefaultsBtn = document.getElementById("resetDefaultsBtn");
+
+    // Modal Elements
+    var portalModal = document.getElementById("portalModal");
+    var modalTitle = document.getElementById("modalTitle");
+    var closeModalBtn = document.getElementById("closeModalBtn");
+    var cancelModalBtn = document.getElementById("cancelModalBtn");
+    var portalForm = document.getElementById("portalForm");
+    var inputTitle = document.getElementById("inputTitle");
+    var inputUrl = document.getElementById("inputUrl");
+    var inputCategory = document.getElementById("inputCategory");
+    var inputIcon = document.getElementById("inputIcon");
+    var inputDesc = document.getElementById("inputDesc");
+    var inputPinned = document.getElementById("inputPinned");
+    var colorOptions = document.getElementById("colorOptions");
+
+    // Save portals
+    function savePortals() {
+      try {
+        localStorage.setItem("workhub_portals", JSON.stringify(portals));
+      } catch (err) {}
+      render();
+    }
+
+    // Theme Management
+    function initTheme() {
+      var theme = "light";
+      try {
+        var savedTheme = localStorage.getItem("workhub_theme");
+        if (savedTheme) {
+          theme = savedTheme;
+        } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+          theme = "dark";
+        }
+      } catch (err) {}
+
+      setTheme(theme);
+    }
+
+    function setTheme(theme) {
+      document.documentElement.setAttribute("data-theme", theme);
+      try {
+        localStorage.setItem("workhub_theme", theme);
+      } catch (err) {}
+
+      if (theme === "dark") {
+        themeIcon.textContent = "☀️";
+      } else {
+        themeIcon.textContent = "🌙";
+      }
+    }
+
+    themeToggleBtn.addEventListener("click", function() {
+      var isDark = document.documentElement.getAttribute("data-theme") === "dark";
+      setTheme(isDark ? "light" : "dark");
+    });
+
+    // View Toggle
+    viewGridBtn.addEventListener("click", function() {
+      currentView = "grid";
+      viewGridBtn.classList.add("active");
+      viewListBtn.classList.remove("active");
+      renderPortals();
+    });
+
+    viewListBtn.addEventListener("click", function() {
+      currentView = "list";
+      viewListBtn.classList.add("active");
+      viewGridBtn.classList.remove("active");
+      renderPortals();
+    });
+
+    // Color options in form
+    function renderColorOptions() {
+      var html = "";
+      for (var i = 0; i < COLOR_PALETTES.length; i++) {
+        var c = COLOR_PALETTES[i];
+        var isSel = (c.name === selectedColor) ? " selected" : "";
+        html += '<div class="color-circle' + isSel + '" data-color="' + c.name + '" style="background-color: ' + c.hex + ';" onclick="selectThemeColor(\'' + c.name + '\')"></div>';
+      }
+      colorOptions.innerHTML = html;
+    }
+
+    window.selectThemeColor = function(name) {
+      selectedColor = name;
+      renderColorOptions();
+    };
+
+    // Quick Emoji Picker Function
+    window.selectEmoji = function(em) {
+      inputIcon.value = em;
+    };
+
+    // Render Categories (Only All, F.M POTAL, and SIDES POTAL)
+    function renderCategories() {
+      var cats = ["All", "F.M POTAL", "SIDES POTAL"];
+
+      var html = "";
+      for (var j = 0; j < cats.length; j++) {
+        var c = cats[j];
+        var isAct = (c === currentCategory) ? " active" : "";
+        var count = 0;
+        if (c === "All") {
+          count = portals.length;
+        } else {
+          for (var l = 0; l < portals.length; l++) {
+            if (portals[l].category === c) count++;
+          }
+        }
+
+        html += '<button class="category-chip' + isAct + '" onclick="selectCategory(\'' + c + '\')">';
+        html += '<span>' + c + '</span>';
+        html += '<span class="category-count">' + count + '</span>';
+        html += '</button>';
+      }
+      categoriesBar.innerHTML = html;
+    }
+
+    window.selectCategory = function(cat) {
+      currentCategory = cat;
+      renderCategories();
+      renderPortals();
+    };
+
+    // Filter Portals
+    function getFilteredPortals() {
+      var query = searchQuery.toLowerCase().trim();
+      var list = [];
+
+      for (var i = 0; i < portals.length; i++) {
+        var p = portals[i];
+        if (currentCategory !== "All") {
+          if (p.category !== currentCategory) continue;
+        }
+
+        if (query) {
+          var inTitle = p.title.toLowerCase().indexOf(query) !== -1;
+          var inDesc = p.description.toLowerCase().indexOf(query) !== -1;
+          var inUrl = p.url.toLowerCase().indexOf(query) !== -1;
+          var inCat = p.category.toLowerCase().indexOf(query) !== -1;
+          if (!inTitle && !inDesc && !inUrl && !inCat) continue;
+        }
+
+        list.push(p);
+      }
+
+      // Pinned on top
+      list.sort(function(a, b) {
+        if (a.pinned && !b.pinned) return -1;
+        if (!a.pinned && b.pinned) return 1;
+        return 0;
+      });
+
+      return list;
+    }
+
+    // Render Cards
+    function renderPortals() {
+      var filtered = getFilteredPortals();
+      portalsCount.textContent = portals.length + " Connected Portals";
+
+      if (filtered.length === 0) {
+        portalsContainer.innerHTML = '<div class="empty-state">' +
+          '<div class="empty-icon">📂</div>' +
+          '<div class="empty-title">No matching portals found</div>' +
+          '<div class="empty-text">Search term se koi website match nahi hui.</div>' +
+          '<button class="btn-primary" style="margin: 0 auto;" onclick="clearSearchFilter()">Clear Search</button>' +
+        '</div>';
+        return;
+      }
+
+      if (currentView === "grid") {
+        var html = '<div class="portals-grid">';
+        for (var i = 0; i < filtered.length; i++) {
+          var p = filtered[i];
+          var host = p.url.replace(/^https?:\/\//i, '').replace(/\/.*$/, '');
+          var col = p.themeColor || "blue";
+          var starClass = p.pinned ? " is-pinned" : "";
+
+          html += '<div class="portal-card color-' + col + '">' +
+            '<div class="card-top-bar">' +
+              '<span class="card-cat-label">' + p.category + '</span>' +
+              '<div class="card-actions-top">' +
+                '<button class="icon-action-btn' + starClass + '" title="Pin / Unpin" onclick="togglePinPortal(\'' + p.id + '\')">' +
+                  '<svg width="14" height="14" viewBox="0 0 24 24" fill="' + (p.pinned ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>' +
+                '</button>' +
+                '<button class="icon-action-btn" title="Edit Portal" onclick="openEditModal(\'' + p.id + '\')">' +
+                  '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>' +
+                '</button>' +
+                '<button class="icon-action-btn btn-trash" title="Delete Portal" onclick="deletePortal(\'' + p.id + '\')">' +
+                  '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>' +
+                '</button>' +
+              '</div>' +
+            '</div>' +
+
+            '<div class="card-body">' +
+              '<div class="card-title-row">' +
+                '<div class="card-app-icon">' + (p.icon || '📁') + '</div>' +
+                '<div class="card-title-meta">' +
+                  '<h2 class="card-title">' + p.title + '</h2>' +
+                  '<span class="card-host">' + host + '</span>' +
+                '</div>' +
+              '</div>' +
+
+              '<p class="card-description">' + p.description + '</p>' +
+
+              '<div class="card-footer">' +
+                '<button class="btn-copy-link" id="copy-btn-' + p.id + '" onclick="copyLinkUrl(\'' + p.url + '\', \'' + p.id + '\')">' +
+                  '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>' +
+                  '<span>Copy Link</span>' +
+                '</button>' +
+
+                '<a href="' + p.url + '" target="_blank" rel="noopener noreferrer" class="btn-open-site">' +
+                  '<span>Open Website</span>' +
+                  '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>' +
+                '</a>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+        }
+        html += '</div>';
+        portalsContainer.innerHTML = html;
+      } else {
+        // List View
+        var html = '<div class="portals-list">';
+        for (var i = 0; i < filtered.length; i++) {
+          var p = filtered[i];
+          var host = p.url.replace(/^https?:\/\//i, '').replace(/\/.*$/, '');
+          var col = p.themeColor || "blue";
+          var starClass = p.pinned ? " is-pinned" : "";
+
+          html += '<div class="list-row color-' + col + '">' +
+            '<div class="list-left">' +
+              '<div class="list-icon">' + (p.icon || '📁') + '</div>' +
+              '<div class="list-info">' +
+                '<div class="list-title-row">' +
+                  '<span class="list-title">' + p.title + '</span>' +
+                  '<span class="list-cat">' + p.category + '</span>' +
+                '</div>' +
+                '<div class="list-desc">' + p.description + '</div>' +
+              '</div>' +
+            '</div>' +
+
+            '<div class="list-right">' +
+              '<span class="list-host">' + host + '</span>' +
+              '<button class="icon-action-btn' + starClass + '" title="Pin" onclick="togglePinPortal(\'' + p.id + '\')">' +
+                '<svg width="14" height="14" viewBox="0 0 24 24" fill="' + (p.pinned ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>' +
+              '</button>' +
+              '<button class="icon-action-btn" title="Edit" onclick="openEditModal(\'' + p.id + '\')">' +
+                '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>' +
+              '</button>' +
+              '<button class="icon-action-btn btn-trash" title="Delete" onclick="deletePortal(\'' + p.id + '\')">' +
+                '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>' +
+              '</button>' +
+              '<a href="' + p.url + '" target="_blank" rel="noopener noreferrer" class="btn-open-site" style="padding: 6px 12px; font-size: 0.775rem;">' +
+                '<span>Open</span>' +
+              '</a>' +
+            '</div>' +
+          '</div>';
+        }
+        html += '</div>';
+        portalsContainer.innerHTML = html;
+      }
+    }
+
+    // Search events
+    function handleSearch(val) {
+      searchQuery = val;
+      if (val) {
+        clearSearchBtn.style.display = "block";
+      } else {
+        clearSearchBtn.style.display = "none";
+      }
+      renderPortals();
+    }
+
+    desktopSearch.addEventListener("input", function(e) {
+      mobileSearch.value = e.target.value;
+      handleSearch(e.target.value);
+    });
+
+    mobileSearch.addEventListener("input", function(e) {
+      desktopSearch.value = e.target.value;
+      handleSearch(e.target.value);
+    });
+
+    clearSearchBtn.addEventListener("click", function() {
+      desktopSearch.value = "";
+      mobileSearch.value = "";
+      handleSearch("");
+      desktopSearch.focus();
+    });
+
+    window.clearSearchFilter = function() {
+      desktopSearch.value = "";
+      mobileSearch.value = "";
+      currentCategory = "All";
+      handleSearch("");
+      renderCategories();
+    };
+
+    // Keyboard shortcut: '/' focuses search
+    window.addEventListener("keydown", function(e) {
+      if ((e.key === "/" || (e.key === "k" && (e.metaKey || e.ctrlKey))) && document.activeElement !== desktopSearch && document.activeElement !== mobileSearch) {
+        e.preventDefault();
+        desktopSearch.focus();
+      } else if (e.key === "Escape") {
+        closeModal();
+      }
+    });
+
+    // Actions
+    window.togglePinPortal = function(id) {
+      for (var i = 0; i < portals.length; i++) {
+        if (portals[i].id === id) {
+          portals[i].pinned = !portals[i].pinned;
+          break;
+        }
+      }
+      savePortals();
+    };
+
+    window.deletePortal = function(id) {
+      if (confirm("Are you sure you want to remove this portal?")) {
+        portals = portals.filter(function(p) { return p.id !== id; });
+        savePortals();
+      }
+    };
+
+    window.copyLinkUrl = function(url, id) {
+      navigator.clipboard.writeText(url);
+      var btn = document.getElementById("copy-btn-" + id);
+      if (btn) {
+        btn.innerHTML = '<span style="color: #10b981;">✓ Copied</span>';
+        setTimeout(function() {
+          btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg><span>Copy Link</span>';
+        }, 1800);
+      }
+    };
+
+    resetDefaultsBtn.addEventListener("click", function() {
+      if (confirm("Reset all portals back to default?")) {
+        portals = DEFAULT_PORTALS.slice();
+        currentCategory = "All";
+        searchQuery = "";
+        desktopSearch.value = "";
+        mobileSearch.value = "";
+        savePortals();
+      }
+    });
+
+    // Modal Add / Edit
+    addWebsiteBtn.addEventListener("click", function() {
+      openAddModal();
+    });
+
+    function openAddModal() {
+      editingPortalId = null;
+      modalTitle.textContent = "Add New Office Website";
+      inputTitle.value = "";
+      inputUrl.value = "https://";
+      inputCategory.value = "F.M POTAL";
+      inputIcon.value = "💼";
+      inputDesc.value = "";
+      inputPinned.checked = false;
+      selectedColor = "blue";
+      renderColorOptions();
+      portalModal.classList.add("open");
+      inputTitle.focus();
+    }
+
+    window.openEditModal = function(id) {
+      var found = null;
+      for (var i = 0; i < portals.length; i++) {
+        if (portals[i].id === id) { found = portals[i]; break; }
+      }
+      if (!found) return;
+
+      editingPortalId = id;
+      modalTitle.textContent = "Edit Website Portal";
+      inputTitle.value = found.title;
+      inputUrl.value = found.url;
+      inputCategory.value = found.category;
+      inputIcon.value = found.icon;
+      inputDesc.value = found.description;
+      inputPinned.checked = found.pinned;
+      selectedColor = found.themeColor || "blue";
+      renderColorOptions();
+      portalModal.classList.add("open");
+      inputTitle.focus();
+    };
+
+    function closeModal() {
+      portalModal.classList.remove("open");
+      editingPortalId = null;
+    }
+
+    closeModalBtn.addEventListener("click", closeModal);
+    cancelModalBtn.addEventListener("click", closeModal);
+    portalModal.addEventListener("click", function(e) {
+      if (e.target === portalModal) closeModal();
+    });
+
+    // Save portal form
+    portalForm.addEventListener("submit", function(e) {
+      e.preventDefault();
+      var title = inputTitle.value.trim();
+      var url = inputUrl.value.trim();
+      if (!title || !url) return;
+
+      if (!url.startsWith("http://") && !url.startsWith("https://")) {
+        url = "https://" + url;
+      }
+
+      if (editingPortalId) {
+        for (var i = 0; i < portals.length; i++) {
+          if (portals[i].id === editingPortalId) {
+            portals[i].title = title;
+            portals[i].url = url;
+            portals[i].category = inputCategory.value;
+            portals[i].icon = inputIcon.value.trim() || "📁";
+            portals[i].description = inputDesc.value.trim();
+            portals[i].themeColor = selectedColor;
+            portals[i].pinned = inputPinned.checked;
+            break;
+          }
+        }
+      } else {
+        var newPortal = {
+          id: "portal-" + Date.now(),
+          title: title,
+          url: url,
+          category: inputCategory.value,
+          icon: inputIcon.value.trim() || "📁",
+          description: inputDesc.value.trim() || "Internal office portal",
+          themeColor: selectedColor,
+          pinned: inputPinned.checked
+        };
+        portals.unshift(newPortal);
+      }
+
+      savePortals();
+      closeModal();
+    });
+
+    // Master Render
+    function render() {
+      renderCategories();
+      renderPortals();
+    }
+
+    // Init
+    initTheme();
+    renderColorOptions();
+    render();
+  </script>
+</body>
+</html>
